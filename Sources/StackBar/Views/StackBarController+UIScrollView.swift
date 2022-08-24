@@ -14,7 +14,12 @@ extension StackBarController {
         animator.isInterruptible = true
         animator.pausesOnCompletion = true
         animator.addAnimations { [unowned self] in
-            backgroundView.effect = UIBlurEffect(style: .systemChromeMaterial)
+            if let customBackgroundViewAnimations = customBackgroundViewAnimationsProvider?(backgroundView) {
+                customBackgroundViewAnimations
+            }
+            else {
+                backgroundVisualEffectView.effect = UIBlurEffect(style: .systemChromeMaterial)
+            }
         }
     }
 

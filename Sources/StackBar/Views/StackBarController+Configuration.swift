@@ -8,8 +8,6 @@
 import Foundation
 import UIKit
 
-public typealias StackBarButtonItem = UIButton
-
 public extension StackBarController {
 
     ///
@@ -18,7 +16,7 @@ public extension StackBarController {
     /// - Parameters:
     ///    - items: The `StackBarItem` objects to place in the stack.
     ///
-    func setItems(_ items: [StackBarItem], animated: Bool = true) {
+    func setItems(_ items: [StackBarItem], animated: Bool = false) {
         configureStackBar(items: items, animated: animated)
     }
 
@@ -41,15 +39,13 @@ public extension StackBarController {
 private extension StackBarController {
 
     func configureStackBar(items: [StackBarItem], animated: Bool) {
-        let duration: TimeInterval = stackBar.arrangedSubviews.isEmpty ? .zero : 0.3
+        let duration: TimeInterval = animated ? 0.3 : .zero
 
         UIViewPropertyAnimator.runningPropertyAnimator(withDuration: duration, delay: .zero) { [weak self] in
             self?.configureStackBar(with: items)
 
         } completion: { [weak self] _ in
-            let backgroundHeight = self?.backgroundView.bounds.height ?? .zero
-
-            self?.rootViewController.additionalSafeAreaInsets.bottom = backgroundHeight
+            self?.configureAdditionalSafeAreaInsets()
         }
         animator.fractionComplete = items.isEmpty ? 1.0 : .zero
     }
@@ -77,5 +73,9 @@ private extension StackBarController {
             }
         }
         self.items = items
+    }
+
+    func configureAdditionalSafeAreaInsets() {
+        rootViewController.additionalSafeAreaInsets.bottom = backgroundView.bounds.height
     }
 }

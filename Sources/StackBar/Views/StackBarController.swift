@@ -64,6 +64,16 @@ public final class StackBarController: UIViewController {
         }
     }
 
+    public var customBackgroundViewAnimationsProvider: ((UIView?) -> Void)?
+
+    ///
+    /// A Boolean value that indicates wether the stack bar's bottom constraint is set relative to the primary button or relative to the stack bar itself.
+    ///
+    /// When this property is set to false and no secondary button exists, the stack bar defines its bottom anchor relative to itself. When this property is set to true or any secondary button exists, the bottom constraints is relative to the primary button and offset from the bottom of the view. The default value of this property is `true`.
+    public var primaryButtonDefinesBottomConstraint: Bool = true
+
+    public var prefersSafeAreaOverConstant: Bool = false
+
     public internal(set) var primaryButton: UIButton? {
         didSet {
             if let primaryButton = primaryButton {
@@ -74,17 +84,38 @@ public final class StackBarController: UIViewController {
                 ])
 
                 primaryButtonTopConstraint?.isActive = true
-                primaryButtonBottomConstraint?.isActive = true
+                primaryButtonBottomConstraint?.isActive = primaryButtonDefinesBottomConstraint || secondaryButton != nil
             }
         }
     }
 
     public internal(set) var secondaryButton: UIButton?
 
+    private(set) lazy var customBackgroundView: UIView? = {
+        guard !prefersDefaultBackground else {
+            return nil
+        }
+        let view = UIView()
+
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .clear
+        view.preservesSuperviewLayoutMargins = true
+
+        return view
+    }()
+
+    var backgroundView: UIView {
+        customBackgroundView ?? backgroundVisualEffectView
+    }
+
+    var contentView: UIView {
+        customBackgroundView ?? backgroundVisualEffectView.contentView
+    }
+
     var items: [StackBarItem] = []
     var cancellable: AnyCancellable?
 
-    private(set) lazy var backgroundView: UIVisualEffectView = {
+    private(set) lazy var backgroundVisualEffectView: UIVisualEffectView = {
         let visualEffectView = UIVisualEffectView(effect: nil)
 
         visualEffectView.translatesAutoresizingMaskIntoConstraints = false
@@ -104,21 +135,23 @@ public final class StackBarController: UIViewController {
         return stackView
     }()
 
-    private lazy var stackBarTopConstraint: NSLayoutConstraint = stackBar.topAnchor.constraint(equalTo: backgroundView.contentView.layoutMarginsGuide.topAnchor)
-    private lazy var stackBarLeadingConstraint: NSLayoutConstraint = stackBar.leadingAnchor.constraint(greaterThanOrEqualTo: backgroundView.contentView.leadingAnchor)
-    private lazy var stackBarTrailingConstraint: NSLayoutConstraint = stackBar.trailingAnchor.constraint(lessThanOrEqualTo: backgroundView.contentView.trailingAnchor)
+    private lazy var stackBarTopConstraint: NSLayoutConstraint = stackBar.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor)
+    private lazy var stackBarLeadingConstraint: NSLayoutConstraint = stackBar.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor)
+    private lazy var stackBarTrailingConstraint: NSLayoutConstraint = stackBar.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor)
     private lazy var primaryButtonTopConstraint: NSLayoutConstraint? = primaryButton?.topAnchor.constraint(greaterThanOrEqualTo: stackBar.topAnchor)
     private lazy var primaryButtonBottomConstraint: NSLayoutConstraint? = primaryButton?.bottomAnchor.constraint(equalTo: view.bottomAnchor)
 
     // MARK: Initializers
 
     let rootViewController: UIViewController
+    let prefersDefaultBackground: Bool
     var animator: UIViewPropertyAnimator
 
-    init(rootViewController: UIViewController) {
-        let animator = UIViewPropertyAnimator(duration: 2.0, curve: .easeInOut)
+    public init(rootViewController: UIViewController, prefersDefaultBackground: Bool = true) {
+        let animator = UIViewPropertyAnimator() // UIViewPropertyAnimator(duration: .zero, curve: .easeInOut)
 
         self.rootViewController = rootViewController
+        self.prefersDefaultBackground = prefersDefaultBackground
         self.animator = animator
 
         super.init(nibName: nil, bundle: nil)
@@ -164,9 +197,9 @@ public final class StackBarController: UIViewController {
 private extension StackBarController {
 
     func configureHierarchy() {
-        view.addSubview(backgroundView)
+        contentView.addSubview(stackBar)
 
-        backgroundView.contentView.addSubview(stackBar)
+        view.addSubview(backgroundView)
 
         NSLayoutConstraint.activate([
             backgroundView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -177,9 +210,10 @@ private extension StackBarController {
             stackBarLeadingConstraint,
             stackBarTrailingConstraint,
 
-            stackBar.bottomAnchor.constraint(lessThanOrEqualTo: backgroundView.contentView.layoutMarginsGuide.bottomAnchor),
+            stackBar.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -16.0).layoutPriority(.defaultLow),
+            stackBar.bottomAnchor.constraint(lessThanOrEqualTo: view.safeAreaLayoutGuide.bottomAnchor),
             stackBar.widthAnchor.constraint(equalToConstant: 360.0).layoutPriority(.defaultHigh),
-            stackBar.centerXAnchor.constraint(equalTo: backgroundView.contentView.centerXAnchor),
+            stackBar.centerXAnchor.constraint(equalTo: view.centerXAnchor),
         ])
 
         // Pointing to our rootViewController's view causes it to load.
