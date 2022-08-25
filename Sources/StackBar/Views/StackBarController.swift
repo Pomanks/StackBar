@@ -139,7 +139,7 @@ public final class StackBarController: UIViewController {
     private lazy var stackBarLeadingConstraint: NSLayoutConstraint = stackBar.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor)
     private lazy var stackBarTrailingConstraint: NSLayoutConstraint = stackBar.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor)
     private lazy var primaryButtonTopConstraint: NSLayoutConstraint? = primaryButton?.topAnchor.constraint(greaterThanOrEqualTo: stackBar.topAnchor)
-    private lazy var primaryButtonBottomConstraint: NSLayoutConstraint? = primaryButton?.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+    private lazy var primaryButtonBottomConstraint: NSLayoutConstraint? = primaryButton?.bottomAnchor.constraint(equalTo: view.bottomAnchor).layoutPriority(.required)
 
     // MARK: Initializers
 
@@ -211,7 +211,7 @@ private extension StackBarController {
             stackBarTrailingConstraint,
 
             stackBar.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -16.0).layoutPriority(.defaultLow),
-            stackBar.bottomAnchor.constraint(lessThanOrEqualTo: view.safeAreaLayoutGuide.bottomAnchor),
+            stackBar.bottomAnchor.constraint(lessThanOrEqualTo: view.safeAreaLayoutGuide.bottomAnchor).layoutPriority(.defaultHigh),
             stackBar.widthAnchor.constraint(equalToConstant: 360.0).layoutPriority(.defaultHigh),
             stackBar.centerXAnchor.constraint(equalTo: view.centerXAnchor),
         ])
