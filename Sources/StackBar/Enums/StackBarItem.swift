@@ -8,9 +8,12 @@
 import Foundation
 import UIKit
 
-public enum StackBarItem {
-    /// The tag parameter can be used to identify the view later using `customView(withTag:)`.
-    case custom(view: UIView, withTag: Int = .zero)
-    case primary(button: UIButton)
-    case secondary(button: UIButton)
+@MainActor
+public enum StackBarItem: Hashable {
+    /// The tag parameter can be used to identify the view later using `customView(withTag:)` and optionally replace it with an updated one.
+    case customView(item: UIView, withTag: Int = .zero)
+    /// On iOS 15.0+, you can update the primary button's configuration directly with the `primaryButton` property.
+    case primaryButton(item: UIButton)
+    /// On iOS 15.0+, you can update the secondary button's configuration directly with the `secondaryButton` property.
+    case secondaryButton(item: UIButton)
 }

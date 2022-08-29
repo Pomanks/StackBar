@@ -18,7 +18,7 @@ extension StackBarController {
                 customBackgroundViewAnimations
             }
             else {
-                backgroundVisualEffectView.effect = UIBlurEffect(style: .systemChromeMaterial)
+                backgroundVisualEffectView.effect = UIBlurEffect(style: .systemUltraThinMaterial)
             }
         }
     }

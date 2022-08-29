@@ -20,16 +20,18 @@ public extension StackBarController {
         configureStackBar(items: items, animated: animated)
     }
 
+    ///
+    /// Use this method to retrieve and update any custom view from the stack bar.
+    ///
     /// - Parameters:
     ///    - tag: An integer that you previously used in a stack bar item with `custom(view:withTag:)`.
     ///
-    ///    - Note: `0` must not be used as a value.
+    ///    - Note: You must have configured the stack bar item with a tag and its value must be other than `0`.
     ///
     func customView(withTag tag: Int) -> UIView? {
         guard tag != .zero else {
             return nil
         }
-
         return stackBar.arrangedSubviews.first(where: { $0.tag == tag })
     }
 }
@@ -58,24 +60,20 @@ private extension StackBarController {
 
         for item in items {
             switch item {
-            case let .custom(view: view, withTag: tag):
+            case let .customView(item: view, withTag: tag):
                 view.tag = tag
 
                 stackBar.addArrangedSubview(view)
 
-            case let .primary(button: button):
+            case let .primaryButton(item: button):
                 stackBar.addArrangedSubview(button)
                 primaryButton = button
 
-            case let .secondary(button: button):
+            case let .secondaryButton(item: button):
                 stackBar.addArrangedSubview(button)
                 secondaryButton = button
             }
         }
         self.items = items
-    }
-
-    func configureAdditionalSafeAreaInsets() {
-        rootViewController.additionalSafeAreaInsets.bottom = backgroundView.bounds.height
     }
 }

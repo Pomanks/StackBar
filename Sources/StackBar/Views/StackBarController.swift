@@ -148,7 +148,7 @@ public final class StackBarController: UIViewController {
     var animator: UIViewPropertyAnimator
 
     public init(rootViewController: UIViewController, prefersDefaultBackground: Bool = true) {
-        let animator = UIViewPropertyAnimator() // UIViewPropertyAnimator(duration: .zero, curve: .easeInOut)
+        let animator = UIViewPropertyAnimator()
 
         self.rootViewController = rootViewController
         self.prefersDefaultBackground = prefersDefaultBackground
@@ -194,6 +194,14 @@ public final class StackBarController: UIViewController {
 
 // MARK: - Helpers
 
+extension StackBarController {
+
+    func configureAdditionalSafeAreaInsets() {
+        // We substitute the existing bottom safe area inset since its already accounted for in the child's view.
+        rootViewController.additionalSafeAreaInsets.bottom = backgroundView.bounds.height - view.safeAreaInsets.bottom
+    }
+}
+
 private extension StackBarController {
 
     func configureHierarchy() {
@@ -229,11 +237,18 @@ private extension StackBarController {
         let isRegularSizeClassAndTallEnough = traitCollection.horizontalSizeClass == .regular && view.bounds.height >= 732
         let constant = isWide ? 44.0 : 24.0
 
-        stackBarTopConstraint.constant = constant // disclaimerText == nil ? constant : stackView.spacing
+        if case let .customView(item: view, withTag: _) = items.first, !view.isHidden {
+            stackBarTopConstraint.constant = 8.0
+        }
+        else {
+            stackBarTopConstraint.constant = constant
+        }
         stackBarLeadingConstraint.constant = constant
         stackBarTrailingConstraint.constant = -constant
 
         primaryButtonTopConstraint?.constant = .zero // Will be used sometime when needing to add stuff above it like a UIPageControl…
         primaryButtonBottomConstraint?.constant = isNotched || isRegularSizeClassAndTallEnough ? -89.0 : -60.0
+
+        configureAdditionalSafeAreaInsets()
     }
 }
