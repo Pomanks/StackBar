@@ -82,8 +82,11 @@ public final class StackBarController: UIViewController {
                     primaryButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 47.0),
                     primaryButton.heightAnchor.constraint(equalToConstant: 50.0).layoutPriority(rawValue: 999),
                 ])
-
+                // Button changed, we need to re-set the constraints.
+                primaryButtonTopConstraint = primaryButton.topAnchor.constraint(greaterThanOrEqualTo: stackBar.topAnchor)
                 primaryButtonTopConstraint?.isActive = true
+
+                primaryButtonBottomConstraint = primaryButton.bottomAnchor.constraint(equalTo: view.bottomAnchor).layoutPriority(.required)
                 primaryButtonBottomConstraint?.isActive = primaryButtonDefinesBottomConstraint || secondaryButton != nil
             }
         }
@@ -138,8 +141,8 @@ public final class StackBarController: UIViewController {
     private lazy var stackBarTopConstraint: NSLayoutConstraint = stackBar.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor)
     private lazy var stackBarLeadingConstraint: NSLayoutConstraint = stackBar.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor)
     private lazy var stackBarTrailingConstraint: NSLayoutConstraint = stackBar.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor)
-    private lazy var primaryButtonTopConstraint: NSLayoutConstraint? = primaryButton?.topAnchor.constraint(greaterThanOrEqualTo: stackBar.topAnchor)
-    private lazy var primaryButtonBottomConstraint: NSLayoutConstraint? = primaryButton?.bottomAnchor.constraint(equalTo: view.bottomAnchor).layoutPriority(.required)
+    var primaryButtonTopConstraint: NSLayoutConstraint?
+    var primaryButtonBottomConstraint: NSLayoutConstraint?
 
     // MARK: Initializers
 
@@ -205,9 +208,9 @@ extension StackBarController {
 private extension StackBarController {
 
     func configureHierarchy() {
-        contentView.addSubview(stackBar)
-
         view.addSubview(backgroundView)
+
+        contentView.addSubview(stackBar)
 
         NSLayoutConstraint.activate([
             backgroundView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
