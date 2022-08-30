@@ -8,7 +8,6 @@
 import Foundation
 import UIKit
 
-@MainActor
 public enum StackBarItem: Hashable {
     /// The tag parameter can be used to identify the view later using `customView(withTag:)` and optionally replace it with an updated one.
     case customView(item: UIView, withTag: Int = .zero)
