@@ -30,5 +30,8 @@ let package = Package(
             name: "StackBarTests",
             dependencies: ["StackBar"]
         ),
+    ],
+    swiftLanguageVersions: [
+        .v5,
     ]
 )
