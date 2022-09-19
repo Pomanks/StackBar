@@ -21,6 +21,18 @@ public extension StackBarController {
     }
 
     ///
+    /// Replaces the stack items currently managed by the stack bar with the specified items and manages the initial state of the secondary button.
+    ///
+    /// - Parameters:
+    ///    - items: The `StackBarItem` objects to place in the stack.
+    ///    - preferringSecondaryButtonHidden:
+    ///
+    func setItems(_ items: [StackBarItem], preferringSecondaryButtonHidden: Bool = false, animated: Bool = false) {
+        setItems(items, animated: animated)
+        prefersSecondaryButtonHidden = preferringSecondaryButtonHidden
+    }
+
+    ///
     /// Use this method to retrieve and update any custom view from the stack bar.
     ///
     /// - Parameters:

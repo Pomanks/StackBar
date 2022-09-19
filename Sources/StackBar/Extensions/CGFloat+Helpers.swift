@@ -10,7 +10,7 @@ import UIKit
 
 extension CGFloat {
 
-    static let iPhoneProMaxGreatestPointsWidth: CGFloat = 428.0
+    static let iPhoneProMaxGreatestPointsWidth: CGFloat = 430.0
 
     static func fractionComplete(in scrollView: UIScrollView, insetBy height: CGFloat) -> CGFloat {
         let threshold = scrollView.bounds.height - scrollView.contentSize.height

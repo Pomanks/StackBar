@@ -67,12 +67,24 @@ public final class StackBarController: UIViewController {
     public var customBackgroundViewAnimationsProvider: ((UIView?) -> Void)?
 
     ///
-    /// A Boolean value that indicates wether the stack bar's bottom constraint is set relative to the primary button or relative to the stack bar itself.
+    /// A Boolean value that indicates wether the stack bar's bottom constraint is relative to the primary button or to the stack bar itself.
     ///
     /// When this property is set to false and no secondary button exists, the stack bar defines its bottom anchor relative to itself. When this property is set to true or any secondary button exists, the bottom constraints is relative to the primary button and offset from the bottom of the view. The default value of this property is `true`.
     public var primaryButtonDefinesBottomConstraint: Bool = true
 
-    public var prefersSafeAreaOverConstant: Bool = false
+    /// A Boolean value that controls wether the secondary button is hidden.
+    public var prefersSecondaryButtonHidden: Bool = false {
+        didSet {
+            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: .zero) { [weak self] in
+                guard let self else {
+                    return
+                }
+                self.secondaryButton?.isHidden = self.prefersSecondaryButtonHidden
+                self.primaryButtonBottomConstraint?.isActive = self.bottomConstraintIsActive
+                self.configureAdditionalSafeAreaInsets()
+            }
+        }
+    }
 
     public internal(set) var primaryButton: UIButton? {
         didSet {
@@ -87,12 +99,16 @@ public final class StackBarController: UIViewController {
                 primaryButtonTopConstraint?.isActive = true
 
                 primaryButtonBottomConstraint = primaryButton.bottomAnchor.constraint(equalTo: view.bottomAnchor).layoutPriority(.required)
-                primaryButtonBottomConstraint?.isActive = primaryButtonDefinesBottomConstraint || secondaryButton != nil
+                primaryButtonBottomConstraint?.isActive = bottomConstraintIsActive
             }
         }
     }
 
     public internal(set) var secondaryButton: UIButton?
+
+    private var bottomConstraintIsActive: Bool {
+        primaryButtonDefinesBottomConstraint || secondaryButton != nil && !prefersSecondaryButtonHidden
+    }
 
     private(set) lazy var customBackgroundView: UIView? = {
         guard !prefersDefaultBackground else {
