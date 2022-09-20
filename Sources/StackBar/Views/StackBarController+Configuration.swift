@@ -29,7 +29,24 @@ public extension StackBarController {
     ///
     func setItems(_ items: [StackBarItem], preferringSecondaryButtonHidden: Bool = false, animated: Bool = false) {
         setItems(items, animated: animated)
+
         prefersSecondaryButtonHidden = preferringSecondaryButtonHidden
+    }
+
+    func setStackBarHidden(_ hidden: Bool, animated: Bool) {
+        let duration: TimeInterval = animated ? 0.3 : .zero
+        let alpha = hidden ? .zero : 1.0
+
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: duration, delay: .zero) { [weak self] in
+            self?.backgroundView.alpha = alpha
+
+            if !hidden {
+                self?.configureAdditionalSafeAreaInsets()
+            }
+            else {
+                self?.rootViewController.additionalSafeAreaInsets.bottom = .zero
+            }
+        }
     }
 
     ///
